@@ -287,6 +287,10 @@ jenkinsList = (msg) ->
       catch error
         msg.send error
 
+jenkinsClear = (msg) ->
+  jobList = []
+  jenkinsList(msg)
+
 module.exports = (robot) ->
 
   robot.hear /([\w\.\-_ /]+) build ([0-9]+) failed/i, (res) ->
@@ -296,24 +300,27 @@ module.exports = (robot) ->
     job = res.match[1]
     res.send ":green_heart: Yay! Making waves here. :sparkles: :tada:"
     
+  robot.respond /j(?:enkins)? b (\d+)/i, (msg) ->
+    jenkinsBuildById(msg)
+    
   #latec: added "/" to job name matching
   robot.respond /j(?:enkins)? build ([\w\.\-_ /]+)(, (.+))?/i, (msg) ->
     jenkinsBuild(msg, false)
 
-  robot.respond /j(?:enkins)? b (\d+)/i, (msg) ->
-    jenkinsBuildById(msg)
-
-  robot.respond /j(?:enkins)? list( (.+))?/i, (msg) ->
-    jenkinsList(msg)
+  robot.respond /j(?:enkins)? desc(?:ribe)? (.*)/i, (msg) ->
+    jenkinsDescribe(msg)
 
   robot.respond /j(?:enkins)? l (\d+)/i, (msg) ->
     jenkinsLastById(msg)
   
-  robot.respond /j(?:enkins)? desc(?:ribe)? (.*)/i, (msg) ->
-    jenkinsDescribe(msg)
-
   robot.respond /j(?:enkins)? last (.*)/i, (msg) ->
     jenkinsLast(msg)
+
+  robot.respond /j(?:enkins)? list( (.+))?/i, (msg) ->
+    jenkinsList(msg)
+
+  robot.respond /j(?:enkins)? clear( (.+))?/i, (msg) ->
+    jenkinsClear(msg)
 
   robot.jenkins = {
     list: jenkinsList,
