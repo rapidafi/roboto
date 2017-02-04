@@ -230,17 +230,14 @@ jenkinsLast = (msg) ->
 
         msg.send response
 
-jenkinsListJobsRecur = (content,filter,level,parentpath) ->
+jenkinsListJobsRecur = (content,filter,parentpath) ->
   response = ""
   for job in content.jobs
     if job._class.match(/Folder$/i)
-      if (filter.test job.name) or (filter.test state)
-        if level>0
-          response += "  " for i in [1..level]
-        response += "* :open_file_folder: **#{job.name}**\n"
-        level++
-        response += jenkinsListJobsRecur(job,filter,level,"#{parentpath}/#{job.name}")
-        level--
+      if parentpath
+        response += jenkinsListJobsRecur(job,filter,"#{parentpath}/#{job.name}")
+      else
+        response += jenkinsListJobsRecur(job,filter,"#{job.name}")
     else
       # Add the job to the jobList
       index = jobList.indexOf("#{parentpath}/#{job.name}")
@@ -261,9 +258,10 @@ jenkinsListJobsRecur = (content,filter,level,parentpath) ->
               else ":large_blue_circle:"
 
       if (filter.test job.name) or (filter.test state)
-        if level>0
-          response += "  " for i in [1..level]
-        response += "* [#{index + 1}] **#{job.name}** #{state}\n"
+        response += "* [#{index + 1}] **"
+        if parentpath
+          response += "#{parentpath}/"
+        response += "#{job.name}** #{state}\n"
   return response
 
 jenkinsList = (msg) ->
@@ -282,7 +280,7 @@ jenkinsList = (msg) ->
     else
       try
         content = JSON.parse(body)
-        response = jenkinsListJobsRecur(content,filter,0,"")
+        response = jenkinsListJobsRecur(content,filter,"")
         msg.send response
       catch error
         msg.send error
@@ -316,7 +314,7 @@ module.exports = (robot) ->
   robot.respond /j(?:enkins)? last (.*)/i, (msg) ->
     jenkinsLast(msg)
 
-  robot.respond /j(?:enkins)? list( (.+))?/i, (msg) ->
+  robot.respond /j(?:enkins)? (?:list|ls)( (.+))?/i, (msg) ->
     jenkinsList(msg)
 
   robot.respond /j(?:enkins)? clear( (.+))?/i, (msg) ->
