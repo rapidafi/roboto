@@ -17,6 +17,7 @@
 #   hubot jenkins list <filter> - lists Jenkins jobs
 #   hubot jenkins describe <job> - Describes the specified Jenkins job
 #   hubot jenkins last <job> - Details about the last build for the specified Jenkins job
+#   hubot jenkins l <jobNumber> - Details about the last build for the job specified by jobNumber. List jobs to get number.
 
 #
 # Author:
@@ -291,13 +292,6 @@ jenkinsClear = (msg) ->
 
 module.exports = (robot) ->
 
-  robot.hear /([\w\.\-_ /]+) build ([0-9]+) failed/i, (res) ->
-    job = res.match[1]
-    res.send ":red_circle: Oh no?! Job **#{job}** needs looking after! :eyes:"
-  robot.hear /([\w\.\-_ /]+) build ([0-9]+) .*was fixed/i, (res) ->
-    job = res.match[1]
-    res.send ":green_heart: Yay! Making waves here. :sparkles: :tada:"
-    
   robot.respond /j(?:enkins)? b (\d+)/i, (msg) ->
     jenkinsBuildById(msg)
     
@@ -315,14 +309,15 @@ module.exports = (robot) ->
     jenkinsLast(msg)
 
   robot.respond /j(?:enkins)? (?:list|ls)( (.+))?/i, (msg) ->
-    jenkinsList(msg)
+    jenkinsClear(msg)
+    #NB! clear every time for now as the list is not that big yet: jenkinsList(msg)
 
-  robot.respond /j(?:enkins)? clear( (.+))?/i, (msg) ->
+  robot.respond /j(?:enkins)? clear(?: list| ls)?( (.+))?/i, (msg) ->
     jenkinsClear(msg)
 
   robot.jenkins = {
     list: jenkinsList,
-    build: jenkinsBuild
-    describe: jenkinsDescribe
+    build: jenkinsBuild,
+    describe: jenkinsDescribe,
     last: jenkinsLast
   }
