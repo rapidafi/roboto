@@ -6,7 +6,6 @@
   "description": "A simple helpful robot for your Company",
   "dependencies": {
     "hubot": "^2.19.0",
-    "hubot-conf": "^1.2.1",
     "hubot-diagnostics": "0.0.1",
     "hubot-flowdock": "^0.7.6",
     "hubot-group": "^1.8.0",
