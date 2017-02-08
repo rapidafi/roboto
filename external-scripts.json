@@ -1,7 +1,8 @@
 [
+  "hubot-conf",
   "hubot-diagnostics",
   "hubot-help",
-  "hubot-group-alias",
+  "hubot-group",
   "hubot-maps",
   "hubot-redis-brain",
   "hubot-rules"
