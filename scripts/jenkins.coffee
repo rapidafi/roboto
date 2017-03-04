@@ -6,9 +6,7 @@
 #
 # Configuration:
 #   HUBOT_JENKINS_URL
-#   HUBOT_JENKINS_AUTH
-#
-#   Auth should be in the "user:password" format.
+#   HUBOT_JENKINS_CRYPTO_SECRET - secret for encrypting/decrypting user credential
 #
 # Commands:
 #   hubot jenkins b <jobNumber> - builds the job specified by jobNumber. List jobs to get number.
@@ -97,9 +95,8 @@ jenkinsBuild = (msg, buildWithEmptyParameters) ->
   
   req = msg.http(path)
 
-  if process.env.HUBOT_JENKINS_AUTH
-    auth = new Buffer(process.env.HUBOT_JENKINS_AUTH).toString('base64')
-    req.headers Authorization: "Basic #{auth}"
+  auth = new Buffer(jenkinsUserCredentials(msg)).toString('base64')
+  req.headers Authorization: "Basic #{auth}"
 
   req.header('Content-Length', 0)
   req.post() (err, res, body) ->
@@ -133,9 +130,8 @@ jenkinsDescribe = (msg) ->
 
   req = msg.http(path)
 
-  if process.env.HUBOT_JENKINS_AUTH
-    auth = new Buffer(process.env.HUBOT_JENKINS_AUTH).toString('base64')
-    req.headers Authorization: "Basic #{auth}"
+  auth = new Buffer(jenkinsUserCredentials(msg)).toString('base64')
+  req.headers Authorization: "Basic #{auth}"
 
   req.header('Content-Length', 0)
   req.get() (err, res, body) ->
@@ -180,9 +176,8 @@ jenkinsDescribe = (msg) ->
 
         path = "#{url}#{jobpath}/#{content.lastBuild.number}/api/json"
         req = msg.http(path)
-        if process.env.HUBOT_JENKINS_AUTH
-          auth = new Buffer(process.env.HUBOT_JENKINS_AUTH).toString('base64')
-          req.headers Authorization: "Basic #{auth}"
+        auth = new Buffer(jenkinsUserCredentials(msg)).toString('base64')
+        req.headers Authorization: "Basic #{auth}"
 
         req.header('Content-Length', 0)
         req.get() (err, res, body) ->
@@ -236,9 +231,8 @@ jenkinsLast = (msg) ->
 
   req = msg.http(path)
 
-  if process.env.HUBOT_JENKINS_AUTH
-    auth = new Buffer(process.env.HUBOT_JENKINS_AUTH).toString('base64')
-    req.headers Authorization: "Basic #{auth}"
+  auth = new Buffer(jenkinsUserCredentials(msg)).toString('base64')
+  req.headers Authorization: "Basic #{auth}"
 
   req.header('Content-Length', 0)
   req.get() (err, res, body) ->
@@ -302,9 +296,8 @@ jenkinsList = (msg) ->
   #latec: get deeper list: req = msg.http("#{url}/api/json")
   req = msg.http("#{url}/api/json?depth=3&tree=jobs[name,color,jobs[name,color,jobs[name,color]]]")
   
-  if process.env.HUBOT_JENKINS_AUTH
-    auth = new Buffer(process.env.HUBOT_JENKINS_AUTH).toString('base64')
-    req.headers Authorization: "Basic #{auth}"
+  auth = new Buffer(jenkinsUserCredentials(msg)).toString('base64')
+  req.headers Authorization: "Basic #{auth}"
 
   req.get() (err, res, body) ->
     if err
