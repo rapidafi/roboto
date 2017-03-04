@@ -18,14 +18,45 @@
 #   hubot jenkins describe <job> - Describes the specified Jenkins job
 #   hubot jenkins last <job> - Details about the last build for the specified Jenkins job
 #   hubot jenkins l <jobNumber> - Details about the last build for the job specified by jobNumber. List jobs to get number.
-
+#   hubot jenkins set auth <user:apitoken> - Set jenkins credentials (get token from https://<jenkins>/user/<user>/configure)
 #
 # Author:
 #   dougcole
-# Modified:
-#   latec (removed inability to call builds under folders)
+#   benwtr
+#   latec
+# 
+# Modifications:
+#   Removed inability to call builds under folders
+#   Added parameters to b command
+#   GitHub authentication
+#    
 
 querystring = require 'querystring'
+crypto = require 'crypto'
+
+crypto_secret = process.env.HUBOT_JENKINS_CRYPTO_SECRET
+
+encrypt = (text) ->
+  cipher = crypto.createCipher('aes-256-cbc', crypto_secret)
+  crypted = cipher.update(text, 'utf8', 'hex')
+  crypted += cipher.final('hex')
+  crypted
+
+decrypt = (text) ->
+  deciper = crypto.createDecipher('aes-256-cbc', crypto_secret)
+  decrypted = deciper.update(text, 'hex', 'utf8')
+  decrypted += deciper.final('utf8')
+  decrypted
+
+jenkinsUserCredentials = (msg) ->
+  user_id = msg.envelope.user.id
+  decrypt(msg.robot.brain.data.users[user_id].jenkins_auth)
+
+jenkinsAuth = (msg) ->
+  user_id = msg.envelope.user.id
+  credentials = msg.match[1].trim()
+  msg.robot.brain.data.users[user_id].jenkins_auth = encrypt(credentials)
+  msg.send "Saved jenkins credentials for #{user_id}"
 
 # Holds a list of jobs, so we can trigger them with a number
 # instead of the job's name. Gets populated on when calling
@@ -315,9 +346,13 @@ module.exports = (robot) ->
   robot.respond /j(?:enkins)? clear(?: list| ls)?( (.+))?/i, (msg) ->
     jenkinsClear(msg)
 
+  robot.respond /j(?:enkins)? set auth (.*)/i, (msg) ->
+    jenkinsAuth(msg)
+
   robot.jenkins = {
     list: jenkinsList,
     build: jenkinsBuild,
     describe: jenkinsDescribe,
-    last: jenkinsLast
+    last: jenkinsLast,
+    auth: jenkinsAuth
   }
