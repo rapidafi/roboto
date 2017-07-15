@@ -32,13 +32,13 @@ module.exports = (robot) ->
   #   res.send "#{res.message.text}? That's a Paddlin'"
   #
   #
-  # enterReplies = ['Hi', 'Target Acquired', 'Firing', 'Hello friend.', 'Gotcha', 'I see you']
-  # leaveReplies = ['Are you still there?', 'Target lost', 'Searching']
-  #
-  # robot.enter (res) ->
-  #   res.send res.random enterReplies
-  # robot.leave (res) ->
-  #   res.send res.random leaveReplies
+  enterReplies = ['Hi', 'Target Acquired', 'Firing', 'Hello friend.', 'Gotcha', 'I see you']
+  leaveReplies = ['Are you still there?', 'Target lost', 'Searching']
+  
+  robot.enter (res) ->
+    res.send res.random enterReplies
+  robot.leave (res) ->
+    res.send res.random leaveReplies
   #
   # answer = process.env.HUBOT_ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE_THE_UNIVERSE_AND_EVERYTHING
   #
@@ -83,24 +83,24 @@ module.exports = (robot) ->
   #
   #   res.send 'OK'
   #
-  # robot.error (err, res) ->
-  #   robot.logger.error "DOES NOT COMPUTE"
-  #
-  #   if res?
-  #     res.reply "DOES NOT COMPUTE"
-  #
-  # robot.respond /have a soda/i, (res) ->
-  #   # Get number of sodas had (coerced to a number).
-  #   sodasHad = robot.brain.get('totalSodas') * 1 or 0
-  #
-  #   if sodasHad > 4
-  #     res.reply "I'm too fizzy.."
-  #
-  #   else
-  #     res.reply 'Sure!'
-  #
-  #     robot.brain.set 'totalSodas', sodasHad+1
-  #
-  # robot.respond /sleep it off/i, (res) ->
-  #   robot.brain.set 'totalSodas', 0
-  #   res.reply 'zzzzz'
+  robot.error (err, res) ->
+    robot.logger.error "DOES NOT COMPUTE"
+  
+    if res?
+      res.reply "DOES NOT COMPUTE"
+  
+  robot.respond /have a soda/i, (res) ->
+    # Get number of sodas had (coerced to a number).
+    sodasHad = robot.brain.get('totalSodas') * 1 or 0
+  
+    if sodasHad > 4
+      res.reply "I'm too fizzy.."
+  
+    else
+      res.reply 'Sure!'
+  
+      robot.brain.set 'totalSodas', sodasHad+1
+  
+  robot.respond /sleep it off/i, (res) ->
+    robot.brain.set 'totalSodas', 0
+    res.reply 'zzzzz'
